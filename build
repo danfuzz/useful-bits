@@ -45,6 +45,7 @@ UNAME="$(uname)"
 
 CC=cc
 COMPILE_C=("${CC}" -std=c99 -g -c)
+COMPILE_LIB_C=("${COMPILE_C[@]}")
 LINK_BIN=("${CC}" -g)
 
 # Figure out if we're using Clang or Gcc, and set up build commands
@@ -52,6 +53,7 @@ LINK_BIN=("${CC}" -g)
 if (cc -v 2>&1 | grep clang) > /dev/null; then
     LINK_LIB=("${CC}" -g -dynamiclib -undefined dynamic_lookup)
 elif (cc -v 2>&1 | grep gcc) > /dev/null; then
+    COMPILE_LIB_C=("${COMPILE_C[@]}" -fPIC)
     LINK_LIB=("${CC}" -g -shared -Ur)
     LINK_BIN=("${LINK_BIN[@]}" -ldl)
 else
@@ -78,13 +80,14 @@ function buildProject {
 
     mkdir -p "${projOut}"
 
-    "${COMPILE_C[@]}" -o "${projBase}.o" "${sources[@]}" \
-    || exit 1
-
     if [[ ${type} == 'host' ]]; then
+        "${COMPILE_C[@]}" -o "${projBase}.o" "${sources[@]}" \
+        || exit 1
         "${LINK_BIN[@]}" -o "${projBase}" "${projBase}.o" \
         || exit 1
     else
+        "${COMPILE_LIB_C[@]}" -o "${projBase}.o" "${sources[@]}" \
+        || exit 1
         "${LINK_LIB[@]}" -o "${projBase}.lib" "${projBase}.o" \
         || exit 1
     fi
