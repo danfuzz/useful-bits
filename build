@@ -42,7 +42,7 @@ OUT="${progDir}/out"
 PROJECTS=(host all-good missing-import missing-export weak-import)
 
 CC=cc
-COMPILE_C=("${CC}" -g -c)
+COMPILE_C=("${CC}" -std=c99 -g -c)
 LINK_BIN=("${CC}" -g)
 
 # Note: The GNU equivalent to `-dynamiclib` seems to be `-shared`, and

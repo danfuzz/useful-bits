@@ -39,7 +39,7 @@ unset newProg
 #
 
 cd "${progDir}"
-./build
+./build || exit 1
 echo ''
 
 cd "out"
