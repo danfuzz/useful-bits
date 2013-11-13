@@ -51,13 +51,23 @@ LINK_BIN=("${CC}" -g)
 # Figure out if we're using Clang or Gcc, and set up build commands
 # accordingly.
 if (cc -v 2>&1 | grep clang) > /dev/null; then
+    # `-dynamiclib` -- Output a dynamic-linked (shared) library.
+    # `-undefined dynamic_lookup` -- Allow missing/unlinked symbols in the
+    #   output. Cause these symbols to be looked up at library load/runtime.
     LINK_LIB=("${CC}" -g -dynamiclib -undefined dynamic_lookup)
 elif (cc -v 2>&1 | grep gcc) > /dev/null; then
+    # `-fPIC` -- Produce position-independent code.
     COMPILE_LIB_C=("${COMPILE_C[@]}" -fPIC)
+    # `-shared` -- Output a dynamic-linked (shared) library.
+    # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
+    #   symbols to be looked up at library load/runtime.
     LINK_LIB=("${CC}" -g -shared -Ur)
-    LINK_BIN=("${LINK_BIN[@]}" -ldl)
+    # `-rdynamic` -- Export symbols defined in the binary such that they
+    #   may be found by runtime-loaded libraries.
+    # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
+    LINK_BIN=("${LINK_BIN[@]}" -rdynamic -ldl)
 else
-    echo 'Unknown compiler version. Sorry!' 1>&2
+    echo 'Unknown compiler. Sorry!' 1>&2
     exit 1
 fi
 
