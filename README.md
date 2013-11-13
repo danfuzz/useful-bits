@@ -38,7 +38,7 @@ Subdirectories of this project
   host.
 
 * `weak-import` &mdash; Library example. It is a proper library despite the fact
-  that it attempts to export the symbol `notFound`, which is not exported
+  that it attempts to import the symbol `notFound`, which is not exported
   by the host. It succeeds, because it declares the symbol reference as
   "weak", which means that it gets set to `NULL` when the library is loaded.
 
