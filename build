@@ -39,7 +39,7 @@ unset newProg
 #
 
 OUT="${progDir}/out"
-PROJECTS=(host blort frotz missing-import missing-export)
+PROJECTS=(host all-good missing-import missing-export weak-import)
 
 CC=cc
 COMPILE_C=("${CC}" -g -c)

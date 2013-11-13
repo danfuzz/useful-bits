@@ -56,7 +56,7 @@ static void runLib(const char *fileName) {
     // the handle for this library.
     void *libHandle = dlopen(fileName, RTLD_NOW | RTLD_LOCAL);
     if (libHandle == NULL) {
-        printf("%s: Trouble loading: %s\n", fileName, dlerror());
+        printf("%s: Trouble loading: %s\n\n", fileName, dlerror());
         return;
     }
 
@@ -67,7 +67,7 @@ static void runLib(const char *fileName) {
 
     int result = dlclose(libHandle);
     if (result != 0) {
-        printf("%s: Trouble closing: %s\n", fileName, dlerror());
+        printf("%s: Trouble closing: %s\n\n", fileName, dlerror());
     }
 
     printf("%s: Done.\n\n", fileName);

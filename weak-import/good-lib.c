@@ -14,14 +14,14 @@ void notFound(void) __attribute__((weak));
 
 static void init(void) __attribute__((constructor));
 static void init(void) {
-    hook("init() called inside frotz.");
+    hook("init() called inside weak-import.");
 }
 
 void run(void) {
-    hook("run() called inside frotz.");
+    hook("run() called inside weak-import.");
     if (notFound == NULL) {
-        hook("Properly found that `notFound == NULL`");
+        hook("Properly found that `notFound == NULL`.");
     } else {
-        hook("Unexpectedly found that `notFound != NULL`");
+        hook("Unexpectedly found that `notFound != NULL`.");
     }
 }
