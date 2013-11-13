@@ -1,1 +1,95 @@
 #!/bin/bash
+#
+# Copyright 2013 the DL Example Authors (Dan Bornstein et alia).
+# Licensed AS IS and WITHOUT WARRANTY under the Apache License,
+# Version 2.0. Details: <http://www.apache.org/licenses/LICENSE-2.0>
+
+#
+# Directory and program name detection
+#
+
+# Preserve the original working dir as origDir.
+origDir="${PWD}"
+
+# Set progName to the program name, progDir to its directory, and baseDir
+# to progDir's directory. Follows symlinks.
+prog="$0"
+while [[ -h ${prog} ]]; do
+    [[ "$(/bin/ls -ld "${prog}")" =~ .*' -> '(.*)$ ]]
+    newProg="${BASH_REMATCH[1]}"
+    if [[ ${newProg} =~ ^/ ]]; then
+        prog="${newProg}"
+    else
+        prog="$(dirname "${prog}")/${newProg}"
+    fi
+done
+progName="$(basename "${prog}")"
+progDir="$(dirname "${prog}")"
+cd "${progDir}"
+progDir="${PWD}"
+cd ..
+baseDir="${PWD}"
+cd "${origDir}"
+unset prog
+unset newProg
+
+
+#
+# Variable setup
+#
+
+OUT="${progDir}/out"
+PROJECTS=(host blort frotz)
+
+CC=cc
+COMPILE_C=("${CC}" -g -c)
+LINK_BIN=("${CC}" -g)
+
+# Note: The GNU equivalent to `-dynamiclib` seems to be `-shared`, and
+# the equivalent to `-undefined dynamic_lookup` seems to be `-Ur`.
+LINK_LIB=("${CC}" -g -dynamiclib -undefined dynamic_lookup)
+
+
+#
+# Helper functions
+#
+
+# Builds the given subdirectory.
+function buildProject {
+    local project="$1"
+    local projOut="${OUT}/${project}"
+    local projBase="${projOut}/${project}"
+
+    echo "Building: ${project}"
+
+    cd "${progDir}/${project}"
+    local type="$(cat "project-type.txt")"
+    local sources=($(find . -name '*.c'))
+
+    mkdir -p "${projOut}"
+
+    "${COMPILE_C[@]}" -o "${projBase}.o" "${sources[@]}" \
+    || exit 1
+
+    if [[ ${type} == 'host' ]]; then
+        "${LINK_BIN[@]}" -o "${projBase}" "${projBase}.o" \
+        || exit 1
+    else
+        "${LINK_LIB[@]}" -o "${projBase}.lib" "${projBase}.o" \
+        || exit 1
+    fi
+}
+
+
+#
+# Main script
+#
+
+rm -rf "${OUT}" || exit 1
+mkdir -p "${OUT}" || exit 1
+
+for project in "${PROJECTS[@]}"; do
+    buildProject "${project}"
+done
+
+echo 'Done!'
