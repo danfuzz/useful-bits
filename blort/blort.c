@@ -1,0 +1,1 @@
+void hook(const char *);
