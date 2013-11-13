@@ -16,6 +16,9 @@ In this case, the `host` executable exports a function named
 libraries. It opens each library, looks up the `run` function,
 and calls it.
 
+The code has been tested on OS X (compiled with Clang) and
+Linux (compiled with Gcc, and running in a Gnu environment).
+
 Subdirectories of this project
 ------------------------------
 
@@ -24,8 +27,7 @@ Subdirectories of this project
 * host &mdash; The `host` executable
 
 * blort &mdash; Library example. It is a proper library, importing `hook`,
-  exporting `run`, and defining a library initialization function (called
-  a "constructor").
+  exporting `run`, and defining library constructor and destructor functions.
 
 * frotz &mdash; Library example. It is a proper library despite the fact
   that it attempts to export the symbol `notFound`, which is not exported
@@ -39,3 +41,55 @@ Subdirectories of this project
 * missing-import &mdash; Library example. It should fail to load, because it
   attempts to import the symbol `notFound`, which is not exported by the
   host.
+
+Testing
+-------
+
+To test the code, run the `test` script in the base directory of
+the project. You should see something like this:
+
+```
+$ ./test
+Building: host
+Building: all-good
+Building: missing-import
+Building: missing-export
+Building: weak-import
+Done!
+
+./all-good/all-good.lib: Loading
+>>> init() called inside all-good.
+./all-good/all-good.lib: Running
+>>> run() called inside all-good.
+./all-good/all-good.lib: Closing
+>>> shutdown() called inside all-good.
+./all-good/all-good.lib: Done.
+
+./missing-export/missing-export.lib: Loading
+>>> init() called inside missing-export.
+./missing-export/missing-export.lib: Running
+Trouble looking up `run`: dlsym(0x7fe2c9c03940, run): symbol not found
+./missing-export/missing-export.lib: Closing
+>>> shutdown() called inside missing-export.
+./missing-export/missing-export.lib: Done.
+
+./missing-import/missing-import.lib: Loading
+./missing-import/missing-import.lib: Trouble loading: dlopen(./missing-import/missing-import.lib, 6): Symbol not found: _notFound
+  Referenced from: ./missing-import/missing-import.lib
+  Expected in: flat namespace
+ in ./missing-import/missing-import.lib
+
+./weak-import/weak-import.lib: Loading
+>>> init() called inside weak-import.
+./weak-import/weak-import.lib: Running
+>>> run() called inside weak-import.
+>>> Properly found that `notFound == NULL`.
+./weak-import/weak-import.lib: Closing
+>>> shutdown() called inside weak-import.
+./weak-import/weak-import.lib: Done.
+```
+
+Contributing
+------------
+
+Contributions welcome! See [CONTRIBUTING.md].
