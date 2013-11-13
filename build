@@ -53,6 +53,7 @@ if (cc -v 2>&1 | grep clang) > /dev/null; then
     LINK_LIB=("${CC}" -g -dynamiclib -undefined dynamic_lookup)
 elif (cc -v 2>&1 | grep gcc) > /dev/null; then
     LINK_LIB=("${CC}" -g -shared -Ur)
+    LINK_BIN=("${LINK_BIN[@]}" -ldl)
 else
     echo 'Unknown compiler version. Sorry!' 1>&2
     exit 1
