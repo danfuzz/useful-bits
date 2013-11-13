@@ -22,22 +22,22 @@ Linux (compiled with Gcc, and running in a Gnu environment).
 Subdirectories of this project
 ------------------------------
 
-* etc &mdash; Miscellaneous support files.
+* `etc` &mdash; Miscellaneous support files.
 
-* host &mdash; The `host` executable.
+* `host` &mdash; The `host` executable.
 
-* all-good &mdash; Library example. It is a proper library, importing `hook`,
+* `all-good` &mdash; Library example. It is a proper library, importing `hook`,
   exporting `run`, and defining library constructor and destructor functions.
 
-* missing-export &mdash; Library example. It should succeed in loading
-  and initializing, but it shoudl fail to run, because it does not export
+* `missing-export` &mdash; Library example. It should succeed in loading
+  and initializing, but it should fail to run, because it does not export
   the symbol `run`. The host always tries to look that symbol up.
 
-* missing-import &mdash; Library example. It should fail to load, because it
+* `missing-import` &mdash; Library example. It should fail to load, because it
   attempts to import the symbol `notFound`, which is not exported by the
   host.
 
-* weak-import &mdash; Library example. It is a proper library despite the fact
+* `weak-import` &mdash; Library example. It is a proper library despite the fact
   that it attempts to export the symbol `notFound`, which is not exported
   by the host. It succeeds, because it declares the symbol reference as
   "weak", which means that it gets set to `NULL` when the library is loaded.
