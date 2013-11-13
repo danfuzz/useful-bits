@@ -11,6 +11,11 @@ static void init(void) {
     hook("init() called inside all-good.");
 }
 
+static void shutdown(void) __attribute__((destructor));
+static void shutdown(void) {
+    hook("shutdown() called inside all-good.");
+}
+
 void run(void) {
     hook("run() called inside all-good.");
 }

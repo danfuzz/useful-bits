@@ -11,4 +11,9 @@ static void init(void) {
     hook("init() called inside missing-export.");
 }
 
+static void shutdown(void) __attribute__((destructor));
+static void shutdown(void) {
+    hook("shutdown() called inside missing-export.");
+}
+
 // `run` is intentionally *not* defined in this code.

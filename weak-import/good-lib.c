@@ -17,6 +17,11 @@ static void init(void) {
     hook("init() called inside weak-import.");
 }
 
+static void shutdown(void) __attribute__((destructor));
+static void shutdown(void) {
+    hook("shutdown() called inside weak-import.");
+}
+
 void run(void) {
     hook("run() called inside weak-import.");
     if (notFound == NULL) {

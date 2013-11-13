@@ -12,6 +12,11 @@ static void init(void) {
     hook("init() called inside missing-import.");
 }
 
+static void shutdown(void) __attribute__((destructor));
+static void shutdown(void) {
+    hook("shutdown() called inside missing-import.");
+}
+
 void run(void) {
     hook("run() called inside missing-import.");
     notFound();
