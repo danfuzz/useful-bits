@@ -92,4 +92,4 @@ Trouble looking up `run`: dlsym(0x7fe2c9c03940, run): symbol not found
 Contributing
 ------------
 
-Contributions welcome! See [CONTRIBUTING.md].
+Contributions welcome! See <CONTRIBUTING.md>.
