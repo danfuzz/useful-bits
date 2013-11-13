@@ -43,6 +43,6 @@ cd "${progDir}"
 echo ''
 
 cd "out"
-LIBS=($(find . -name '*.lib'))
+LIBS=($(find . -name '*.lib' | sort))
 
 host/host "${LIBS[@]}"
