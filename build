@@ -51,6 +51,7 @@ fi
 COMPILE_C=("${CC}" -std=c99 -g -c)
 COMPILE_LIB_C=("${COMPILE_C[@]}")
 LINK_BIN=("${CC}" -g)
+LINK_BIN_SUFFIX=()
 
 # Figure out if we're using Clang or Gcc, and set up build commands
 # accordingly.
@@ -81,7 +82,9 @@ case "${WHAT_CC}" in
         # `-rdynamic` -- Export symbols defined in the binary such that they
         #   may be found by runtime-loaded libraries.
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
+        #   Needs to come at the end of the link command.
         LINK_BIN=("${LINK_BIN[@]}" -rdynamic -ldl)
+        LINK_BIN_SUFFIX=(-ldl)
     ;;
     (*)
         echo 1>&2 "Sorry: Cannot use compiler: ${WHAT_CC}"
@@ -110,14 +113,15 @@ function buildProject {
 
     if [[ ${type} == 'host' ]]; then
         "${COMPILE_C[@]}" -o "${projBase}.o" "${sources[@]}" \
-        || exit 1
+            || exit 1
         "${LINK_BIN[@]}" -o "${projBase}" "${projBase}.o" \
-        || exit 1
+            "${LINK_BIN_SUFFIX[@]}" \
+            || exit 1
     else
         "${COMPILE_LIB_C[@]}" -o "${projBase}.o" "${sources[@]}" \
-        || exit 1
+            || exit 1
         "${LINK_LIB[@]}" -o "${projBase}.lib" "${projBase}.o" \
-        || exit 1
+            || exit 1
     fi
 }
 
