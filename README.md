@@ -3,6 +3,7 @@ Dynamic Library Loading Example
 
 This is a small but complete example, written in C, which shows:
 
+* How to build a host executable into which a dynamic library can be loaded.
 * How to build a dynamic library with intentional holes.
 * How to load and use such a library within a host runtime, using the
   `dlsym()` family of functions.
@@ -17,8 +18,9 @@ In this case, the `host` executable exports a function named
 libraries. It opens each library, looks up the `run` function,
 and calls it.
 
-The code has been tested on OS X (compiled with Clang) and
-Linux (compiled with Gcc, and running in a Gnu environment).
+The code has been tested on OS X (compiled with Clang) and Linux (compiled
+with Gcc and Clang, and running in a Gnu environment).
+
 
 Subdirectories of this project
 ------------------------------
