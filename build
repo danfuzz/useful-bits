@@ -64,9 +64,11 @@ case "${OSTYPE}" in
     (linux* | Linux*)
         WHAT_OS='linux'
     ;;
+
     (darwin* | Darwin* | *bsd* | *BSD*)
         WHAT_OS='bsd'
     ;;
+
     (*)
         echo 1>&2 "Sorry: Unknown OS type: ${OSTYPE}"
         exit 1
@@ -81,6 +83,7 @@ case "${WHAT_OS}" in
         #   library is loaded or run.
         LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
     ;;
+
     (linux)
         # `-fPIC` -- Produce position-independent code.
         COMPILE_LIB_C+=(-fPIC)
@@ -97,7 +100,7 @@ case "${WHAT_OS}" in
         # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
         #   symbols to be looked up at library load/runtime.
         LINK_LIB+=(-shared -Ur)
-        ;;
+    ;;
 esac
 
 
