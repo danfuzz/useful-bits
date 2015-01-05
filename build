@@ -92,9 +92,6 @@ case "${WHAT_CC}" in
         : # Nothing extra to add.
     ;;
     (gcc)
-        # `-fPIC` -- Produce position-independent code.
-        COMPILE_LIB_C+=(-fPIC)
-
         # `-shared` -- Output a dynamic-linked (shared) library.
         # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
         #   symbols to be looked up at library load/runtime.
@@ -115,6 +112,9 @@ case "${WHAT_OS}" in
         LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
     ;;
     (linux)
+        # `-fPIC` -- Produce position-independent code.
+        COMPILE_LIB_C+=(-fPIC)
+
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
         #   Needs to come at the end of the link command.
         LINK_BIN_SUFFIX+=(-ldl)
