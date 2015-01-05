@@ -91,6 +91,14 @@ Trouble looking up `run`: dlsym(0x7fe2c9c03940, run): symbol not found
 ./weak-import/weak-import.lib: Done.
 ```
 
+If you have multiple C compilers available, you can select which one to
+use by setting the `${CC}` environment variable before running, e.g.:
+
+```shell
+$ CC=clang ./test
+```
+
+
 Contributing
 ------------
 
