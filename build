@@ -92,14 +92,7 @@ case "${WHAT_CC}" in
         : # Nothing extra to add.
     ;;
     (gcc)
-        # `-shared` -- Output a dynamic-linked (shared) library.
-        # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
-        #   symbols to be looked up at library load/runtime.
-        LINK_LIB+=(-shared -Ur)
-
-        # `-rdynamic` -- Export symbols defined in the binary such that they
-        #   may be found by runtime-loaded libraries.
-        LINK_BIN+=(-rdynamic)
+        : # Nothing extra to add.
     ;;
 esac
 
@@ -115,10 +108,19 @@ case "${WHAT_OS}" in
         # `-fPIC` -- Produce position-independent code.
         COMPILE_LIB_C+=(-fPIC)
 
+        # `-rdynamic` -- Export symbols defined in the binary such that they
+        #   may be found by runtime-loaded libraries.
+        LINK_BIN+=(-rdynamic)
+
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
         #   Needs to come at the end of the link command.
         LINK_BIN_SUFFIX+=(-ldl)
-    ;;
+
+        # `-shared` -- Output a dynamic-linked (shared) library.
+        # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
+        #   symbols to be looked up at library load/runtime.
+        LINK_LIB+=(-shared -Ur)
+        ;;
 esac
 
 
