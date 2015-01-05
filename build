@@ -89,10 +89,7 @@ fi
 
 case "${WHAT_CC}" in
     (clang)
-        # `-dynamiclib` -- Output a dynamic-linked (shared) library.
-        # `-undefined dynamic_lookup` -- Allow missing/unlinked symbols in the
-        #   output. Cause these symbols to be looked up at library load/runtime.
-        LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
+        : # Nothing extra to add.
     ;;
     (gcc)
         # `-fPIC` -- Produce position-independent code.
@@ -111,7 +108,10 @@ esac
 
 case "${WHAT_OS}" in
     (bsd)
-        : # Nothing more to do.
+        # `-dynamiclib` -- Output a dynamic-linked (shared) library.
+        # `-undefined dynamic_lookup` -- Allow missing/unlinked symbols in the
+        #   output. Cause these symbols to be looked up at library load/runtime.
+        LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
     ;;
     (linux)
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
