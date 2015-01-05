@@ -52,6 +52,7 @@ COMPILE_C=("${CC}" -std=c99 -g -c)
 COMPILE_LIB_C=("${COMPILE_C[@]}")
 LINK_BIN=("${CC}" -g)
 LINK_BIN_SUFFIX=()
+LINK_LIB=("${CC}" -g)
 
 # Figure out what OS and compiler we have, and set up build commands
 # accordingly.
@@ -91,20 +92,20 @@ case "${WHAT_CC}" in
         # `-dynamiclib` -- Output a dynamic-linked (shared) library.
         # `-undefined dynamic_lookup` -- Allow missing/unlinked symbols in the
         #   output. Cause these symbols to be looked up at library load/runtime.
-        LINK_LIB=("${CC}" -g -dynamiclib -undefined dynamic_lookup)
+        LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
     ;;
     (gcc)
         # `-fPIC` -- Produce position-independent code.
-        COMPILE_LIB_C=("${COMPILE_C[@]}" -fPIC)
+        COMPILE_LIB_C+=(-fPIC)
 
         # `-shared` -- Output a dynamic-linked (shared) library.
         # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
         #   symbols to be looked up at library load/runtime.
-        LINK_LIB=("${CC}" -g -shared -Ur)
+        LINK_LIB+=(-shared -Ur)
 
         # `-rdynamic` -- Export symbols defined in the binary such that they
         #   may be found by runtime-loaded libraries.
-        LINK_BIN=("${LINK_BIN[@]}" -rdynamic)
+        LINK_BIN+=(-rdynamic)
     ;;
 esac
 
@@ -115,7 +116,7 @@ case "${WHAT_OS}" in
     (linux)
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
         #   Needs to come at the end of the link command.
-        LINK_BIN_SUFFIX=(-ldl)
+        LINK_BIN_SUFFIX+=(-ldl)
     ;;
 esac
 
