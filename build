@@ -43,7 +43,11 @@ PROJECTS=(host all-good missing-import missing-export weak-import)
 
 UNAME="$(uname)"
 
-CC=cc
+# Set `$CC` to `"cc"` if it's not already set.
+if [[ ${CC} == '' ]]; then
+    CC='cc'
+fi
+
 COMPILE_C=("${CC}" -std=c99 -g -c)
 COMPILE_LIB_C=("${COMPILE_C[@]}")
 LINK_BIN=("${CC}" -g)
