@@ -104,9 +104,17 @@ case "${WHAT_CC}" in
 
         # `-rdynamic` -- Export symbols defined in the binary such that they
         #   may be found by runtime-loaded libraries.
+        LINK_BIN=("${LINK_BIN[@]}" -rdynamic)
+    ;;
+esac
+
+case "${WHAT_OS}" in
+    (bsd)
+        : # Nothing more to do.
+    ;;
+    (linux)
         # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
         #   Needs to come at the end of the link command.
-        LINK_BIN=("${LINK_BIN[@]}" -rdynamic -ldl)
         LINK_BIN_SUFFIX=(-ldl)
     ;;
 esac
