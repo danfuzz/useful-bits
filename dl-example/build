@@ -1,0 +1,151 @@
+#!/bin/bash
+#
+# Copyright 2013 the DL Example Authors (Dan Bornstein et alia).
+# Licensed AS IS and WITHOUT WARRANTY under the Apache License,
+# Version 2.0. Details: <http://www.apache.org/licenses/LICENSE-2.0>
+
+#
+# Directory and program name detection
+#
+
+# Preserve the original working dir as origDir.
+origDir="${PWD}"
+
+# Set progName to the program name, progDir to its directory, and baseDir
+# to progDir's directory. Follows symlinks.
+prog="$0"
+while [[ -h ${prog} ]]; do
+    [[ "$(/bin/ls -ld "${prog}")" =~ .*' -> '(.*)$ ]]
+    newProg="${BASH_REMATCH[1]}"
+    if [[ ${newProg} =~ ^/ ]]; then
+        prog="${newProg}"
+    else
+        prog="$(dirname "${prog}")/${newProg}"
+    fi
+done
+progName="$(basename "${prog}")"
+progDir="$(dirname "${prog}")"
+cd "${progDir}"
+progDir="${PWD}"
+cd ..
+baseDir="${PWD}"
+cd "${origDir}"
+unset prog
+unset newProg
+
+
+#
+# Variable setup
+#
+
+OUT="${progDir}/out"
+PROJECTS=(host all-good missing-import missing-export weak-import)
+
+UNAME="$(uname)"
+
+# Set `$CC` to `"cc"` if it's not already set.
+if [[ ${CC} == '' ]]; then
+    CC='cc'
+fi
+
+COMPILE_C=("${CC}" -std=c99 -g -c)
+COMPILE_LIB_C=("${COMPILE_C[@]}")
+LINK_BIN=("${CC}" -g)
+LINK_BIN_SUFFIX=()
+LINK_LIB=("${CC}" -g)
+
+# Figure out what OS we have, and set up build commands accordingly.
+
+if [[ ${OSTYPE} == '' ]]; then
+    OSTYPE="$(uname)"
+fi
+
+case "${OSTYPE}" in
+    (linux* | Linux*)
+        WHAT_OS='linux'
+    ;;
+
+    (darwin* | Darwin* | *bsd* | *BSD*)
+        WHAT_OS='bsd'
+    ;;
+
+    (*)
+        echo 1>&2 "Sorry: Unknown OS type: ${OSTYPE}"
+        exit 1
+    ;;
+esac
+
+case "${WHAT_OS}" in
+    (bsd)
+        # `-dynamiclib` -- Output a dynamic-linked (shared) library.
+        # `-undefined dynamic_lookup` -- Allow missing/unlinked symbols in the
+        #   output. That will cause such symbols to be looked up when the
+        #   library is loaded or run.
+        LINK_LIB+=(-dynamiclib -undefined dynamic_lookup)
+    ;;
+
+    (linux)
+        # `-fPIC` -- Produce position-independent code.
+        COMPILE_LIB_C+=(-fPIC)
+
+        # `-rdynamic` -- Export symbols defined in the binary such that they
+        #   may be found by runtime-loaded libraries.
+        LINK_BIN+=(-rdynamic)
+
+        # `-ldl` -- Link this binary with the `dl` (dynamic linker) library.
+        #   Needs to come at the end of the link command.
+        LINK_BIN_SUFFIX+=(-ldl)
+
+        # `-shared` -- Output a dynamic-linked (shared) library.
+        # `-Ur` -- Allow missing/unlinked symbols in the output. Cause these
+        #   symbols to be looked up at library load/runtime.
+        LINK_LIB+=(-shared -Ur)
+    ;;
+esac
+
+
+#
+# Helper functions
+#
+
+# Builds the given subdirectory.
+function buildProject {
+    local project="$1"
+    local projOut="${OUT}/${project}"
+    local projBase="${projOut}/${project}"
+
+    echo "Building: ${project}"
+
+    cd "${progDir}/${project}"
+    local type="$(cat "project-type.txt")"
+    local sources=($(find . -name '*.c'))
+
+    mkdir -p "${projOut}"
+
+    if [[ ${type} == 'host' ]]; then
+        "${COMPILE_C[@]}" -o "${projBase}.o" "${sources[@]}" \
+            || exit 1
+        "${LINK_BIN[@]}" -o "${projBase}" "${projBase}.o" \
+            "${LINK_BIN_SUFFIX[@]}" \
+            || exit 1
+    else
+        "${COMPILE_LIB_C[@]}" -o "${projBase}.o" "${sources[@]}" \
+            || exit 1
+        "${LINK_LIB[@]}" -o "${projBase}.lib" "${projBase}.o" \
+            || exit 1
+    fi
+}
+
+
+#
+# Main script
+#
+
+rm -rf "${OUT}" || exit 1
+mkdir -p "${OUT}" || exit 1
+
+for project in "${PROJECTS[@]}"; do
+    buildProject "${project}"
+done
+
+echo 'Done!'
