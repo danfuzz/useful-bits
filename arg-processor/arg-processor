@@ -188,8 +188,7 @@ function opt-toggle {
 # Declares a "value" option, which requires a value when passed on a
 # commandline. No `<abbrev>` or `<value>` is allowed in the argument spec. If
 # left unspecified, the default variable value for a value option is `''` (the
-# empty string). This definer also accepts the `--required` and `--filter`
-# options.
+# empty string). This definer also accepts the `--required` option.
 function opt-value {
     local optCall=''
     local optDefault=''
@@ -220,7 +219,7 @@ function opt-value {
 # Declares a positional argument. No `<abbrev>` or `<value>` is allowed in the
 # argument spec. Unlike options, a positional argument name is _only_ used for
 # error messages and internal bookkeeping. This definer also accepts the
-# `--required` and `--filter` options.
+# `--required` option.
 function positional-arg {
     local optCall=''
     local optDefault=''
@@ -357,8 +356,7 @@ function require-exactly-one-arg-of {
 
 # Declares a "rest" argument, which gets all the otherwise-untaken positional
 # arguments, during parsing. If this is not declared, argument processing will
-# report an error in the presence of any "rest" arguments. This definer also
-# accepts the `--filter` option; the filter runs on each argument individually.
+# report an error in the presence of any "rest" arguments.
 function rest-arg {
     local optCall=''
     local optFilter=''
