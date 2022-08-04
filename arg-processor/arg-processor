@@ -21,7 +21,8 @@
 # depending on the definition function.
 #
 # The public argument-defining functions also all these options, of which
-# at least one of `--call` or `--var` must be used.
+# at least one of `--call` or `--var` must be used. When multiple of these are
+# present, evaluation order is filter then call then variable setting.
 # * `--call=<name>` or `--call={<code>}` -- Calls the named function passing it
 #   the argument value(s), or runs the indicated code snippet. If the call
 #   fails, the argument is rejected. In the snippet form, normal positional
@@ -32,12 +33,11 @@
 #   such it cannot be used to affect the global environment of the main script.
 # * `--filter=/<regex>/` -- Matches each argument value against the regex. If
 #   the regex doesn't match, the argument is rejected.
-# * `--var=<name>` -- Sets the named variable to the argument value(s). If both
-#   this and `--call` are used, the call is made first and the variable is only
-#   set if the call succeeds. The variable is always initialized to a default
-#   value, which is itself optionally specified via `--default=<value>`. If
-#   `--default` isn't used (or isn't available), then the default-for-the-
-#   default depends on the specific function.
+# * `--var=<name>` -- Sets the named variable to the argument value(s). The
+#   variable is always initialized to a default value, which is itself
+#   optionally specified via `--default=<value>`. If `--default` isn't used (or
+#   isn't available), then the default-for-the-default depends on the specific
+#   function.
 #
 # Some argument-definers also accept `--required`, to indicate that the argument
 # or option is required (mandatory).
@@ -189,7 +189,7 @@ function opt-enum {
     fi
 
     _argproc_define-value-required-arg --option \
-        "${specName}" "${optCall}" "${optVar}" "${filterExpr}"
+        "${specName}" "${filterExpr}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
@@ -255,7 +255,7 @@ function opt-value {
     fi
 
     _argproc_define-value-required-arg --option \
-        "${specName}" "${optCall}" "${optVar}" "${optFilter}"
+        "${specName}" "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
@@ -286,7 +286,7 @@ function positional-arg {
     fi
 
     _argproc_define-value-required-arg \
-        "${specName}" "${optCall}" "${optVar}" "${optFilter}"
+        "${specName}" "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
@@ -579,9 +579,9 @@ function _argproc_define-value-required-arg {
     fi
 
     local longName="$1"
-    local callFunc="$2"
-    local varName="$3"
-    local filter="$4"
+    local filter="$2"
+    local callFunc="$3"
+    local varName="$4"
 
     local handlerName
     if (( isOption )); then
