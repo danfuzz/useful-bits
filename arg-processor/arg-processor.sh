@@ -211,7 +211,7 @@ function opt-value {
     fi
 
     _argproc_define-value-taking-arg --option \
-        "${specName}" "${optFilter}" "${optCall}" "${optVar}"
+        "${specName}" '' "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
@@ -242,7 +242,7 @@ function positional-arg {
     fi
 
     _argproc_define-value-taking-arg \
-        "${specName}" "${optFilter}" "${optCall}" "${optVar}"
+        "${specName}" '' "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
@@ -536,9 +536,10 @@ function _argproc_define-value-taking-arg {
     fi
 
     local longName="$1"
-    local filter="$2"
-    local callFunc="$3"
-    local varName="$4"
+    local eqDefault="$2" # TODO: Use this!
+    local filter="$3"
+    local callFunc="$4"
+    local varName="$5"
 
     local handlerName
     if (( isOption )); then
