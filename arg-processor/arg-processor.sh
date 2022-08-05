@@ -188,9 +188,11 @@ function opt-toggle {
 }
 
 # Declares a "value" option, which requires a value when passed on a
-# commandline. No `<abbrev>` or `<value>` is allowed in the argument spec. If
-# left unspecified, the default variable value for a value option is `''` (the
-# empty string). This definer also accepts the `--required` option.
+# commandline. If a <value> is passed in the spec, then the resulting option is
+# value-optional, with the no-value form using the given <value>. No <abbrev> is
+# allowed in the argument spec. If left unspecified, the default variable value
+# for a value option is `''` (the empty string). This definer also accepts the
+# `--required` option.
 function opt-value {
     local optCall=''
     local optDefault=''
@@ -202,7 +204,8 @@ function opt-value {
     || return 1
 
     local specName=''
-    _argproc_parse-spec "${args[0]}" \
+    local specValue=''
+    _argproc_parse-spec --value-eq "${args[0]}" \
     || return 1
 
     if [[ ${optVar} != '' ]]; then
@@ -211,7 +214,7 @@ function opt-value {
     fi
 
     _argproc_define-value-taking-arg --option \
-        "${specName}" '' "${optFilter}" "${optCall}" "${optVar}"
+        "${specName}" "${specValue}" "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
         _argproc_add-required-arg-postcheck "${specName}"
