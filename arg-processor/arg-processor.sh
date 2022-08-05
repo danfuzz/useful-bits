@@ -153,12 +153,12 @@ function opt-choice {
     fi
 }
 
-# Declares a "toggle" option, which does not accept a value on the commandline.
-# No `<value>` is allowed in the argument spec. The toggle state of off or on is
-# always indicated by a value of `0` or `1` (respectively). In addition to the
-# main long-form option `--<name>`, this function also defines `--no-<name>` to
-# turn the toggle off. If left unspecified, the default variable value for a
-# toggle option is `0`.
+# Declares a "toggle" option, which allows setting of a value to `0` or `1`. No
+# `<value>` is allowed in the argument spec. The main long form option name can
+# be used without a value to indicate "on" (`1`), or it can be used as
+# `--<name>=1` or `--<name>=0` to indicate a specific state. In addition, the
+# long form `--no-<name>` can be used to indicate "off" (`0`).
+# The default variable value for a toggle option is `0`.
 function opt-toggle {
     local optCall=''
     local optFilter=''
@@ -177,10 +177,11 @@ function opt-toggle {
         _argproc_initStatements+=("${optVar}=0")
     fi
 
-    _argproc_define-no-value-arg --option \
-        "${specName}" '1' "${optFilter}" "${optCall}" "${optVar}" "${specAbbrev}"
-    _argproc_define-no-value-arg --option \
-        "no-${specName}" '0' "${optFilter}" "${optCall}" "${optVar}" ''
+    # Extra filter on the positive option, so it can take a value.
+    _argproc_define-value-taking-arg --option "${specName}" \
+        '=1' "/^[01]$/\n${optFilter}" "${optCall}" "${optVar}" \
+    _argproc_define-no-value-arg --option "no-${specName}" \
+        '0' "${optFilter}" "${optCall}" "${optVar}" ''
 
     if [[ ${specAbbrev} != '' ]]; then
         _argproc_define-abbrev "${specAbbrev}" "${specName}"
