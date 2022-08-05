@@ -210,7 +210,7 @@ function opt-value {
         _argproc_initStatements+=("${optVar}=$(_argproc_quote "${optDefault}")")
     fi
 
-    _argproc_define-value-required-arg --option \
+    _argproc_define-value-taking-arg --option \
         "${specName}" "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
@@ -241,7 +241,7 @@ function positional-arg {
         _argproc_initStatements+=("${optVar}=$(_argproc_quote "${optDefault}")")
     fi
 
-    _argproc_define-value-required-arg \
+    _argproc_define-value-taking-arg \
         "${specName}" "${optFilter}" "${optCall}" "${optVar}"
 
     if (( optRequired )); then
@@ -484,8 +484,8 @@ function _argproc_define-abbrev {
     }'
 }
 
-# Defines an argument activation function which prohibits passing a value, as
-# the value is "built into" the argument spec.
+# Defines an activation function for an argument/option which prohibits getting
+# passed a value.
 function _argproc_define-no-value-arg {
     if [[ $1 == '--option' ]]; then
         shift
@@ -526,8 +526,9 @@ function _argproc_define-no-value-arg {
     fi
 }
 
-# Defines an argument/option activation function which requires passing a value.
-function _argproc_define-value-required-arg {
+# Defines an activation function for an argument/option which can or must be
+# passed a value.
+function _argproc_define-value-taking-arg {
     local isOption=0
     if [[ $1 == '--option' ]]; then
         isOption=1
