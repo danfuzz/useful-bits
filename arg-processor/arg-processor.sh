@@ -595,6 +595,7 @@ function _argproc_handler-body {
         filters="${BASH_REMATCH[2]}"
         if [[ ${f} =~ ^/(.*)/$ ]]; then
             # Add a loop to perform the regex check on each argument.
+            f="${BASH_REMATCH[1]}"
             result+=(
                 "$(printf '
                     local _argproc_value
