@@ -585,37 +585,40 @@ function _argproc_define-value-taking-arg {
 function _argproc_handler-body {
     local longName="$1"
     local desc="$2"
-    local filter="$3"
+    local filters="$3"
     local callFunc="$4"
     local varName="$5"
     local result=()
 
-    if [[ ${filter} =~ ^/(.*)/$ ]]; then
-        # Add a loop to perform the regex check on each argument.
-        filter="${BASH_REMATCH[1]}"
-        result+=(
-            "$(printf '
-                local _argproc_value
-                for _argproc_value in "$@"; do
-                    if ! [[ ${_argproc_value} =~ %s ]]; then
-                        error-msg "Invalid value for %s: ${_argproc_value}"
-                        return 1
-                    fi
-                done' \
-                "${filter}" "${desc}")"
-        )
-    elif [[ ${filter} != '' ]]; then
-        # Add a loop to call the filter function on each argument.
-        result+=(
-            "$(printf '
-                local _argproc_value _argproc_args=()
-                for _argproc_value in "$@"; do
-                    _argproc_args+=("$(%s "${_argproc_value}")") || return 1
-                done
-                set -- "${_argproc_args[@]}"' \
-                "${filter}")"
-        )
-    fi
+    while [[ ${filters} =~ ^$'\n'*([^$'\n']*)'\n'*(.*)$ ]]; do
+        local f="${BASH_REMATCH[1]}"
+        filters="${BASH_REMATCH[2]}"
+        if [[ ${f} =~ ^/(.*)/$ ]]; then
+            # Add a loop to perform the regex check on each argument.
+            result+=(
+                "$(printf '
+                    local _argproc_value
+                    for _argproc_value in "$@"; do
+                        if ! [[ ${_argproc_value} =~ %s ]]; then
+                            error-msg "Invalid value for %s: ${_argproc_value}"
+                            return 1
+                        fi
+                    done' \
+                    "${f}" "${desc}")"
+            )
+        else
+            # Add a loop to call the filter function on each argument.
+            result+=(
+                "$(printf '
+                    local _argproc_value _argproc_args=()
+                    for _argproc_value in "$@"; do
+                        _argproc_args+=("$(%s "${_argproc_value}")") || return 1
+                    done
+                    set -- "${_argproc_args[@]}"' \
+                    "${f}")"
+            )
+        fi
+    done
 
     if [[ ${callFunc} =~ ^\{(.*)\}$ ]]; then
         # Add a compound statement for the code block.
