@@ -98,12 +98,6 @@ function progress-msg {
             --read)
                 readStdin=1
                 ;;
-            --print-option)
-                (( _stderr_progressEnabled )) \
-                && echo '--progress' \
-                || echo '--no-progress'
-                wasCmd=1
-                ;;
             --set=1|--set=0)
                 _stderr_progressEnabled="${1#*=}"
                 wasCmd=1
