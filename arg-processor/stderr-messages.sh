@@ -82,11 +82,9 @@ function error-msg {
 # Prints a "progress" message to stderr, if such are enabled.
 #
 # --read -- Read messages from stdin.
-# --print-option -- Prints `--progress` or `--no-progress` to stdout, reflecting
-#   the enabled status. (This is to make it easy to propagate the progress state
-#   down into another command.)
 # --set=0|1 -- Enable or disable error message printing.
-# --status -- Prints `1` or `0` to stdout, to indicate enabled status.
+# --status -- Prints `1` or `0` to stdout, to indicate enabled status. (This is
+#   to make it easy to propagate the progress state down into another command.)
 #
 # Note: Progress messages are _disabled by default.
 function progress-msg {
