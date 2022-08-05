@@ -51,7 +51,7 @@ function error-msg {
                 break
                 ;;
             *)
-                echo 1>&2 "Unrecognized option: $1"
+                error-msg "Unrecognized option: $1"
                 return 1
                 ;;
         esac
@@ -84,7 +84,7 @@ function error-msg-switch {
             _stderr_errorEnabled=0
             ;;
         *)
-            echo 1>&2 "Unrecognized argument: $1"
+            error-msg "Unrecognized argument: $1"
             return 1
     esac
 }
