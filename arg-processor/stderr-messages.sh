@@ -66,7 +66,7 @@ function error-msg {
         msg="${_stderr_cmdName}: ${msg}"
     fi
 
-    # `printf` to avoid option-parsing weirdness with `echo`
+    # `printf` to avoid option-parsing weirdness with `echo`.
     printf 1>&2 '%s\n' "${msg}"
     _stderr_anyErrors=1
 }
@@ -94,7 +94,8 @@ function error-msg-switch {
 # messages.
 function progress-msg {
     if (( _stderr_progressEnabled )); then
-        echo 1>&2 "$@"
+        # `printf` to avoid option-parsing weirdness with `echo`.
+        printf 1>&2 '%s\n' "$*"
     fi
 }
 
