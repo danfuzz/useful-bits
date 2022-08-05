@@ -757,12 +757,17 @@ function _argproc_janky-args {
 function _argproc_parse-spec {
     local abbrevOk=0
     local valueOk=0
-    while [[ $1 =~ ^--(value|abbrev) ]]; do
-        if [[ $1 == '--abbrev' ]]; then
-            abbrevOk=1
-        else
-            valueOk=1
-        fi
+    local valueWithEqual=0
+    while [[ $1 =~ ^-- ]]; do
+        case "$1" in
+            --abbrev)   abbrevOk=1;               ;;
+            --value)    valueOk=1;                ;;
+            --value-eq) valueOk=1; valueWithEq=1; ;;
+            *)
+                error-msg "Unrecognized option: $1"
+                return 1
+                ;;
+        esac
         shift
     done
 
@@ -785,9 +790,15 @@ function _argproc_parse-spec {
     fi
 
     if (( valueOk )); then
-        specHasValue="$([[ ${value} == '' ]]; echo $?)"
-        if (( specHasValue )); then
-            specValue="${value:1}" # `:1` to drop the equal sign.
+        if (( !valueWithEq )); then
+            specHasValue="$([[ ${value} == '' ]]; echo "$?")"
+        fi
+
+        if [[ ${value} != '' ]]; then
+            if (( !valueWithEq )); then
+                value="${value:1}" # `:1` to drop the equal sign.
+            fi
+            specValue="${value}"
         fi
     elif [[ ${value} != '' ]]; then
         error-msg "Value not allowed in spec: ${spec}"
