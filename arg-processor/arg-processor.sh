@@ -536,7 +536,7 @@ function _argproc_define-value-taking-arg {
     fi
 
     local longName="$1"
-    local eqDefault="$2" # TODO: Use this!
+    local eqDefault="$2"
     local filter="$3"
     local callFunc="$4"
     local varName="$5"
@@ -555,10 +555,20 @@ function _argproc_define-value-taking-arg {
         _argproc_handler-body "${longName}" "${desc}" "${filter}" "${callFunc}" "${varName}"
     )"
 
+    local ifNoValue=''
+    if [[ ${eqDefault} == '' ]]; then
+        # No default value, therefore value required.
+        ifNoValue='
+            error-msg "Value required for '"${desc}"'."
+            return 1'
+    else
+        eqDefault="$(_argproc_quote "${eqDefault:1}")" # `:1` to drop the `=`.
+        ifNoValue="set -- ${eqDefault}"
+    fi
+
     eval 'function '"${handlerName}"' {
         if (( $# < 1 )); then
-            error-msg "Value required for '"${desc}"'."
-            return 1
+            '"${ifNoValue}"'
         fi
         '"${handlerBody}"'
     }'
