@@ -771,7 +771,7 @@ function _argproc_janky-args {
 function _argproc_parse-spec {
     local abbrevOk=0
     local valueOk=0
-    local valueWithEqual=0
+    local valueWithEq=0
     while [[ $1 =~ ^-- ]]; do
         case "$1" in
             --abbrev)   abbrevOk=1;               ;;
