@@ -88,7 +88,7 @@ function opt-action {
     local optFilter=''
     local optVar=''
     local args=("$@")
-    _argproc_janky-args call default filter var \
+    _argproc_janky-args call filter init var \
     || return 1
 
     local specName=''
@@ -119,7 +119,7 @@ function opt-choice {
     local optRequired=0
     local optVar=''
     local args=("$@")
-    _argproc_janky-args --multi-arg call default filter required var \
+    _argproc_janky-args --multi-arg call filter init required var \
     || return 1
 
     if [[ ${optVar} != '' ]]; then
@@ -200,7 +200,7 @@ function opt-value {
     local optRequired=0
     local optVar=''
     local args=("$@")
-    _argproc_janky-args call default enum filter required var \
+    _argproc_janky-args call enum filter init required var \
     || return 1
 
     local specName=''
@@ -233,7 +233,7 @@ function positional-arg {
     local optRequired=0
     local optVar=''
     local args=("$@")
-    _argproc_janky-args call default enum filter required var \
+    _argproc_janky-args call enum filter init required var \
     || return 1
 
     local specName=''
@@ -694,7 +694,7 @@ function _argproc_janky-args {
                     && optCall="${BASH_REMATCH[1]}" \
                     || argError=1
                     ;;
-                default)
+                init)
                     [[ ${value} =~ ^=(.*)$ ]] \
                     && optInit="${BASH_REMATCH[1]}" \
                     || argError=1
