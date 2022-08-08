@@ -36,3 +36,19 @@ function init-cmd {
 init-cmd
 unset -f init-cmd # Leave no trace.
 ```
+
+## To just load a sibling/subdirectory script
+
+It's even easier to _just_ load a file relative to the currently-running script:
+
+* Top-level script:
+
+  ```bash
+  . "$(dirname "$(readlink -f "$0")")/script-name.sh" || exit "$?"
+  ```
+
+* Directly-executing script (e.g., the one being `source`d):
+
+  ```bash
+  . "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/script-name.sh" || exit "$?"
+  ```
