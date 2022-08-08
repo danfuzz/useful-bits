@@ -161,9 +161,10 @@ function opt-choice {
 function opt-toggle {
     local optCall=''
     local optFilter=''
+    local optInit=0
     local optVar=''
     local args=("$@")
-    _argproc_janky-args call filter var \
+    _argproc_janky-args call filter init var \
     || return 1
 
     local specName=''
@@ -173,7 +174,7 @@ function opt-toggle {
 
     if [[ ${optVar} != '' ]]; then
         # Set up the variable initializer.
-        _argproc_initStatements+=("${optVar}=0")
+        _argproc_initStatements+=("${optVar}=$(_argproc_quote "${optInit}")")
     fi
 
     # Extra filter on the positive option, so it can take a value.
