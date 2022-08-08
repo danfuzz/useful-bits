@@ -156,8 +156,8 @@ function opt-choice {
 # `<value>` is allowed in the argument spec. The main long form option name can
 # be used without a value to indicate "on" (`1`), or it can be used as
 # `--<name>=1` or `--<name>=0` to indicate a specific state. In addition, the
-# long form `--no-<name>` can be used to indicate "off" (`0`).
-# The initial variable value for a toggle option is `0`.
+# long form `--no-<name>` can be used to indicate "off" (`0`). If left
+# unspecified, the initial variable value for a toggle option is `0`.
 function opt-toggle {
     local optCall=''
     local optFilter=''
