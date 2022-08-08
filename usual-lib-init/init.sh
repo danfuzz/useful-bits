@@ -39,7 +39,7 @@ fi
 # call, instead of re-re-...-doing it multiple times.
 #
 
-_init_envVarName="$(_init_product-name | tr a-z A-Z)_PREREQUISITES_DONE"
+_init_envVarName="$(_init_product-name | tr a-z- A-Z_)_PREREQUISITES_DONE"
 if [[ ${!_init_envVarName} != 1 ]]; then
     _init_check-prerequisites \
     || {
