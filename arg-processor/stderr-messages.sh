@@ -6,8 +6,11 @@
 # Library for more palatable printing of stuff to stderr.
 #
 # Each of the functions in this library is meant to be used for a different
-# printing "purpose:" `error-msg` for hard errors (that will result in a
-# non-zero) exit from the command. `progress-msg` for progress messages.
+# printing "purpose:"
+#
+# * `error-msg` -- hard errors (that will result in a non-zero exit).
+# * `info-msg` -- one-off requested information.
+# * `progress-msg` -- progress messages.
 #
 # The functions all take the following options:
 #
@@ -32,6 +35,9 @@ _stderr_anyErrors=0
 # Whether error messages are enabled.
 _stderr_errorEnabled=1
 
+# Whether info messages are enabled.
+_stderr_infoEnabled=1
+
 # Whether progress messages are enabled.
 _stderr_progressEnabled=0
 
@@ -46,7 +52,13 @@ function error-msg {
     _stderr_print-handler '_stderr_errorEnabled' '_stderr_anyErrors' "$@"
 }
 
-# Prints a "progress" message to stderr, if such are enabled. **Note:** Progress
+# Prints an info message to stderr, if such are enabled. **Note:** Info
+# messages are _enabled_ by default.
+function info-msg {
+    _stderr_print-handler '_stderr_infoEnabled' '' "$@"
+}
+
+# Prints a progress message to stderr, if such are enabled. **Note:** Progress
 # messages are _disabled_ by default.
 function progress-msg {
     _stderr_print-handler '_stderr_progressEnabled' '' "$@"
