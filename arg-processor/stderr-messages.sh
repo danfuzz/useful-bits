@@ -1,6 +1,22 @@
-# Copyright 2022 Dan Bornstein.
+# stderr-messages v1.0 -- Copyright 2022 Dan Bornstein.
 # Licensed AS IS and WITHOUT WARRANTY under the Apache License, Version 2.0.
 # Details: <http://www.apache.org/licenses/LICENSE-2.0>
+
+#
+# Library for more palatable printing of stuff to stderr.
+#
+# Each of the functions in this library is meant to be used for a different
+# printing "purpose:" `error-msg` for hard errors (that will result in a
+# non-zero) exit from the command. `progress-msg` for progress messages.
+#
+# The functions all take the following options:
+#
+# --exec -- Execute the arguments as a command, instead of treating them as
+#   arguments to print. The command's output gets redirected to `stderr`.
+# --set=0|1 -- Enable or disable printing of this kind of message.
+# --status -- Prints `1` or `0` to stdout, to indicate enabled status. (This is
+#   to make it easy to propagate the enabled state down into another command.)
+#
 
 #
 # Global variable setup
@@ -24,18 +40,31 @@ _stderr_progressEnabled=0
 # Library functions
 #
 
-# Prints an error message to stderr, if such are enabled.
-#
-# --no-name -- Suppress printing of the top-level command name on the first
-#   message.
-# --exec -- Execute the arguments as a command, instead of treating them as
-#   arguments to print.
-# --set=0|1 -- Enable or disable error message printing.
-#
-# Note: Error messages are _enabled_ by default.
+# Prints an error message to stderr, if such are enabled. **Note:** Error
+# messages are _enabled_ by default.
 function error-msg {
+    _stderr_print-handler '_stderr_errorEnabled' '_stderr_anyErrors' "$@"
+}
+
+# Prints a "progress" message to stderr, if such are enabled. **Note:** Progress
+# messages are _disabled_ by default.
+function progress-msg {
+    _stderr_print-handler '_stderr_progressEnabled' '' "$@"
+}
+
+
+#
+# Internal functions
+#
+
+# Common code for the message-printers.
+function _stderr_print-handler {
+    local enabledVarName="$1"
+    local anyMessagesVarName="$2"
+    shift 2
+
     local doExec=0
-    local printName="$(( !_stderr_anyErrors ))"
+    local printName=1
     local wasCmd=0
 
     while [[ $1 =~ ^-- ]]; do
@@ -44,66 +73,18 @@ function error-msg {
                 doExec=1
                 ;;
             --no-name)
+                if [[ ${anyMessagesVarName} == '' ]]; then
+                    error-msg "Unrecognized option: $1"
+                    return 1
+                fi
                 printName=0
                 ;;
             --set=1|--set=0)
-                _stderr_stderrEnabled="${1#*=}"
-                wasCmd=1
-                ;;
-            --)
-                shift
-                break
-                ;;
-            *)
-                error-msg "Unrecognized option: $1"
-                return 1
-                ;;
-        esac
-        shift
-    done
-
-    if (( wasCmd || !_stderr_errorEnabled )); then
-        return
-    fi
-
-    if (( printName )); then
-        printf 1>&2 '%s: ' "${_stderr_cmdName}"
-    fi
-
-    if (( doExec )); then
-        "$@" 1>&2
-    else
-        # `printf` to avoid option-parsing weirdness with `echo`.
-        printf 1>&2 '%s\n' "$*"
-    fi
-
-    _stderr_anyErrors=1
-}
-
-# Prints a "progress" message to stderr, if such are enabled.
-#
-# --exec -- Execute the arguments as a command, instead of treating them as
-#   arguments to print.
-# --set=0|1 -- Enable or disable error message printing.
-# --status -- Prints `1` or `0` to stdout, to indicate enabled status. (This is
-#   to make it easy to propagate the progress state down into another command.)
-#
-# Note: Progress messages are _disabled by default.
-function progress-msg {
-    local doExec=0
-    local wasCmd=0
-
-    while [[ $1 =~ ^-- ]]; do
-        case "$1" in
-            --exec)
-                doExec=1
-                ;;
-            --set=1|--set=0)
-                _stderr_progressEnabled="${1#*=}"
+                eval "${enabledVarName}=${1#*=}"
                 wasCmd=1
                 ;;
             --status)
-                echo "${_stderr_progressEnabled}"
+                echo "${!enabledVarName}"
                 wasCmd=1
                 ;;
             --)
@@ -118,8 +99,15 @@ function progress-msg {
         shift
     done
 
-    if (( wasCmd || !_stderr_progressEnabled )); then
+    if (( wasCmd || !${!enabledVarName} )); then
         return
+    fi
+
+    if [[ ${anyMessagesVarName} != '' ]] && (( !${!anyMessagesVarName} )); then
+        if (( printName )); then
+            printf 1>&2 '%s: ' "${_stderr_cmdName}"
+        fi
+        eval "${anyMessagesVarName}=1"
     fi
 
     if (( doExec )); then
