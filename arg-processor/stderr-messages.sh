@@ -14,6 +14,8 @@
 #
 # The functions all take the following options:
 #
+# --disable / --enable -- Alias for `--set=0` / `--set=1`, to read a bit better
+#   when "manually" turning on or off messages.
 # --exec -- Execute the arguments as a command, instead of treating them as
 #   arguments to print. The command's output gets redirected to `stderr`.
 # --set=0|1 -- Enable or disable printing of this kind of message.
@@ -81,6 +83,14 @@ function _stderr_print-handler {
 
     while [[ $1 =~ ^-- ]]; do
         case "$1" in
+            --disable|--set=0)
+                eval "${enabledVarName}=0"
+                wasCmd=1
+                ;;
+            --enable|--set=1)
+                eval "${enabledVarName}=1"
+                wasCmd=1
+                ;;
             --exec)
                 doExec=1
                 ;;
@@ -90,10 +100,6 @@ function _stderr_print-handler {
                     return 1
                 fi
                 printName=0
-                ;;
-            --set=1|--set=0)
-                eval "${enabledVarName}=${1#*=}"
-                wasCmd=1
                 ;;
             --status)
                 echo "${!enabledVarName}"
