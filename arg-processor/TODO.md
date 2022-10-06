@@ -1,6 +1,7 @@
 TODO
 ====
 
+TODO for `arg-processor`:
 * Make `--enum=` allow for rewriting values, e.g.
   `--enum='1 0 yes=1 no=0 true=1 false=0'`.
 
@@ -20,5 +21,9 @@ TODO
 * Add `opt-alias <alias> :: <expansion>` with short and non-value long options
   as possible alias names, e.g. `opt-alias -d :: --big-dogs --little-dogs
   --dog-size=any` or `opt-alias --all-rules :: --match='.'`.
+
+* Add tests!
+
+TODO for `stderr-messages`:
 
 * Add tests!
