@@ -1,9 +1,10 @@
 Ad-hoc Option Parsing
 =====================
 
-In cases where [the "fancy" `arg-processor`](../arg-processor) is overkill or
-otherwise undesirable, here's some boilerplate for parsing options in a
-reasonably standard-ish and sufficiently robust way.
+In cases where [a "fancy"
+`arg-processor`](https://github.com/danfuzz/bashy-lib/blob/main/lib/arg-processor.sh)
+is overkill or otherwise undesirable, here's some boilerplate for parsing
+options in a reasonably standard-ish and sufficiently robust way.
 
 **Note:** The case form `-?*` means "anything starting with a dash and with more
 characters afterwards." As such, a single dash argument (`-`) is treated as an
